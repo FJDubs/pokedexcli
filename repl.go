@@ -8,21 +8,7 @@ import (
 )
 
 var commandList = map[string]cliCommand{}
-
-func commandHelp() error {
-	fmt.Println("Welcome to the Pokedex!")
-	fmt.Printf("Usage:\n\n")
-	for _, cmd := range commandList {
-		fmt.Printf("%s: %s\n", cmd.name, cmd.description)
-	}
-	return nil
-}
-
-type cliCommand struct {
-	name        string
-	description string
-	callback    func() error
-}
+var Config = config{}
 
 func init() {
 	commandList = map[string]cliCommand{
@@ -36,8 +22,23 @@ func init() {
 			description: "Display a help message",
 			callback:    commandHelp,
 		},
+		"map": {
+			name:        "map",
+			description: "Displays the names of 20 location areas in the Pokemon world. Each subsequent call to map displays the next 20 locations",
+			callback:    commandMap,
+		},
+		"mapb": {
+			name:        "mapb",
+			description: "Displays the names of the previous 20 location areas in the Pokemon world. Each subsequent call to map displays the previous 20 locations",
+			callback:    commandMapB,
+		},
+	}
+	Config = config{
+		Next:     "https://pokeapi.co/api/v2/location-area/?offset=00",
+		Previous: "",
 	}
 }
+
 func startRepl() {
 	scnr := bufio.NewScanner(os.Stdin)
 	for {
@@ -46,7 +47,7 @@ func startRepl() {
 		usrIn := cleanInput(scnr.Text())
 		command, ok := commandList[usrIn[0]]
 		if ok {
-			err := command.callback()
+			err := command.callback(&Config)
 			if err != nil {
 				fmt.Printf("error: %s", err)
 			}
@@ -60,10 +61,4 @@ func startRepl() {
 func cleanInput(text string) []string {
 	words := strings.Fields(strings.ToLower(text))
 	return words
-}
-
-func commandExit() error {
-	fmt.Println("Closing the Pokedex... Goodbye!")
-	os.Exit(0)
-	return nil
 }
