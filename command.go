@@ -114,3 +114,24 @@ func commandCatch(Conf *config) error {
 
 	return nil
 }
+
+func commandInspect(Conf *config) error {
+	pkmnName := Conf.UserArgs[0]
+	pkmn, ok := Conf.CaughtPokemon[pkmnName]
+	if !ok {
+		fmt.Println("You have not caught that Pokemon")
+		return nil
+	}
+	fmt.Printf("Name: %s\n", pkmn.Name)
+	fmt.Printf("Height: %v\n", pkmn.Height)
+	fmt.Printf("Weight: %v\n", pkmn.Weight)
+	fmt.Println("Stats:")
+	for _, stat := range pkmn.Stats {
+		fmt.Printf(" -%s: %v\n", stat.Stat.Name, stat.BaseStat)
+	}
+	fmt.Println("Types:")
+	for _, t := range pkmn.Types {
+		fmt.Printf(" -%s\n", t.Type.Name)
+	}
+	return nil
+}
