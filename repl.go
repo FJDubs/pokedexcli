@@ -49,6 +49,11 @@ func init() {
 			description: "Get details on a pokemon that you have already caught",
 			callback:    commandInspect,
 		},
+		"pokedex": {
+			name:        "pokedex",
+			description: "List Pokemon you have caught",
+			callback:    commandPokedex,
+		},
 	}
 	Config = config{
 		Next:          "https://pokeapi.co/api/v2/location-area/?offset=00",

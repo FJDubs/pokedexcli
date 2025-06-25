@@ -107,6 +107,7 @@ func commandCatch(Conf *config) error {
 	randNum := rand.IntN(100)
 	if randNum <= catchRate {
 		fmt.Printf("%s was caught!\n", pkmnName)
+		fmt.Println("You may now inspect it with the inspect command.")
 		Conf.CaughtPokemon[pkmnName] = pkmn
 	} else {
 		fmt.Printf("%s escaped\n", pkmnName)
@@ -132,6 +133,18 @@ func commandInspect(Conf *config) error {
 	fmt.Println("Types:")
 	for _, t := range pkmn.Types {
 		fmt.Printf(" -%s\n", t.Type.Name)
+	}
+	return nil
+}
+
+func commandPokedex(Conf *config) error {
+	if len(Conf.CaughtPokemon) < 1 {
+		fmt.Println("You have not caught any Pokemon")
+		return nil
+	}
+	fmt.Println("Your Pokedex:")
+	for pkmn := range Conf.CaughtPokemon {
+		fmt.Printf(" - %s\n", pkmn)
 	}
 	return nil
 }
