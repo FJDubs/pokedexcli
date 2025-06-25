@@ -14,8 +14,10 @@ type cliCommand struct {
 }
 
 type config struct {
-	Next     string
-	Previous string
+	Next          string
+	Previous      string
+	PokemonSearch string
+	UserArgs      []string
 }
 
 func commandExit(Conf *config) error {
@@ -66,6 +68,26 @@ func commandMapB(Conf *config) error {
 
 	for _, loc := range locs.Results {
 		fmt.Println(loc.Name)
+	}
+
+	return err
+}
+
+func commandExplore(Conf *config) error {
+	exploreLocation := Conf.UserArgs[0]
+	searchUrl := Conf.PokemonSearch + exploreLocation + "/"
+	fmt.Printf("Exploring %s...\n", Conf.UserArgs[0])
+	pkmn, err := pokeapi.ListPokemonAt(searchUrl)
+	if err != nil {
+		return err
+	}
+	if len(pkmn) == 0 {
+		fmt.Println("No pokemon Found")
+	} else {
+		fmt.Println("Found Pokemon:")
+		for _, name := range pkmn {
+			fmt.Printf("- %s\n", name)
+		}
 	}
 
 	return err

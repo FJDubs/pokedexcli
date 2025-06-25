@@ -32,10 +32,17 @@ func init() {
 			description: "Displays the names of the previous 20 location areas in the Pokemon world. Each subsequent call to map displays the previous 20 locations",
 			callback:    commandMapB,
 		},
+		"explore": {
+			name:        "explore",
+			description: "It takes the name of a location area as an argument, to provide a list of Pokemon in the area",
+			callback:    commandExplore,
+		},
 	}
 	Config = config{
-		Next:     "https://pokeapi.co/api/v2/location-area/?offset=00",
-		Previous: "",
+		Next:          "https://pokeapi.co/api/v2/location-area/?offset=00",
+		Previous:      "",
+		PokemonSearch: "https://pokeapi.co/api/v2/location-area/",
+		UserArgs:      []string{},
 	}
 }
 
@@ -47,6 +54,9 @@ func startRepl() {
 		usrIn := cleanInput(scnr.Text())
 		command, ok := commandList[usrIn[0]]
 		if ok {
+			if len(usrIn) > 1 {
+				Config.UserArgs = usrIn[1:]
+			}
 			err := command.callback(&Config)
 			if err != nil {
 				fmt.Printf("error: %s", err)
