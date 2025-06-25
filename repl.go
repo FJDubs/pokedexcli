@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/FJDubs/pokedexcli/internal/pokeapi"
 )
 
 var commandList = map[string]cliCommand{}
@@ -37,12 +39,17 @@ func init() {
 			description: "It takes the name of a location area as an argument, to provide a list of Pokemon in the area",
 			callback:    commandExplore,
 		},
+		"catch": {
+			name:        "catch",
+			description: "Throw a pokeball to attempt catch the pokemon you name",
+			callback:    commandCatch,
+		},
 	}
 	Config = config{
 		Next:          "https://pokeapi.co/api/v2/location-area/?offset=00",
 		Previous:      "",
-		PokemonSearch: "https://pokeapi.co/api/v2/location-area/",
 		UserArgs:      []string{},
+		CaughtPokemon: make(map[string]pokeapi.Pokemon),
 	}
 }
 
@@ -59,7 +66,7 @@ func startRepl() {
 			}
 			err := command.callback(&Config)
 			if err != nil {
-				fmt.Printf("error: %s", err)
+				fmt.Printf("error: %s\n", err)
 			}
 		} else {
 			fmt.Println("Unknown command")

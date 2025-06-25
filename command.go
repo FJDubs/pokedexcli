@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand/v2"
 	"os"
 
 	"github.com/FJDubs/pokedexcli/internal/pokeapi"
@@ -16,8 +17,8 @@ type cliCommand struct {
 type config struct {
 	Next          string
 	Previous      string
-	PokemonSearch string
 	UserArgs      []string
+	CaughtPokemon map[string]pokeapi.Pokemon
 }
 
 func commandExit(Conf *config) error {
@@ -75,7 +76,7 @@ func commandMapB(Conf *config) error {
 
 func commandExplore(Conf *config) error {
 	exploreLocation := Conf.UserArgs[0]
-	searchUrl := Conf.PokemonSearch + exploreLocation + "/"
+	searchUrl := "https://pokeapi.co/api/v2/location-area/" + exploreLocation + "/"
 	fmt.Printf("Exploring %s...\n", Conf.UserArgs[0])
 	pkmn, err := pokeapi.ListPokemonAt(searchUrl)
 	if err != nil {
@@ -91,4 +92,25 @@ func commandExplore(Conf *config) error {
 	}
 
 	return err
+}
+
+func commandCatch(Conf *config) error {
+	pkmnName := Conf.UserArgs[0]
+	const highestPokemonBaseExperience = 608
+	searchUrl := "https://pokeapi.co/api/v2/pokemon/" + pkmnName
+	pkmn, err := pokeapi.GetPokemonInfo(searchUrl)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Throwing a Pokeball at %s...\n", pkmnName)
+	catchRate := 70 - ((pkmn.BaseExperience * 40) / highestPokemonBaseExperience)
+	randNum := rand.IntN(100)
+	if randNum <= catchRate {
+		fmt.Printf("%s was caught!\n", pkmnName)
+		Conf.CaughtPokemon[pkmnName] = pkmn
+	} else {
+		fmt.Printf("%s escaped\n", pkmnName)
+	}
+
+	return nil
 }
